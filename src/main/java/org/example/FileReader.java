@@ -14,16 +14,15 @@ public class FileReader {
     public static void main(String[] args) throws IOException, SQLException {
 
 
-        FileInputStream file = new FileInputStream(new File("C:\\Users\\reddy\\Downloads\\B&M DMOG Data(insert).xlsx"));
+        FileInputStream file = new FileInputStream(new File("C:\\Users\\dell\\Downloads\\B&M DMOG Data(insert) (1).xlsx"));
         XSSFWorkbook workbook = new XSSFWorkbook(file);
         XSSFSheet sheet = workbook.getSheet("B&M DMOG Data");
-        Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/citrusleaf", "root", "password");
+        Connection conn = DriverManager.getConnection("jdbc:postgresql://localhost:5432/citrusleaf", "postgres", "Bchinna333@");
 
-        int newTableColumns = sheet.getRow(0).getLastCellNum();
-        Statement stmt = conn.createStatement();
-        ResultSet rs = stmt.executeQuery("SELECT * FROM dmogdata  WHERE CUST_ID = 504052067");
+
 
         int rowCount = sheet.getLastRowNum();
+        long startTime= System.currentTimeMillis();
 
         for (int i = 1; i <= rowCount; i++) {
             Row row = sheet.getRow(i);
@@ -33,7 +32,7 @@ public class FileReader {
             String col3 = row.getCell(1).getStringCellValue();
             Double col4 = row.getCell(2).getNumericCellValue();
             // insert values into database
-            String sql = "INSERT INTO dmogdata2 (MOBILENO,CATEGORY,CUST_ID) VALUES (?, ?, ?)";
+            String sql = "INSERT INTO Dmogdata (MOBILENO,CATEGORY,CUST_ID) VALUES (?, ?, ?)";
             PreparedStatement statement = conn.prepareStatement(sql);
 
             statement.setDouble(1, col2);
@@ -41,6 +40,13 @@ public class FileReader {
             statement.setDouble(3, col4);
             statement.executeUpdate();
         }
+        long endTime=System.currentTimeMillis();
+        long totalTime=endTime-startTime;
+
+
+        System.out.println("Total data store time :"+totalTime+"millisSeconds");
+        long minutes=(totalTime/(60*1000));
+        System.out.println("Total data store :-"+minutes);
         conn.close();
         workbook.close();
         file.close();
